@@ -88,24 +88,38 @@ matches <- data.frame(Current_Player = character(),
                       Distance = numeric(),
                       Historical_Year = integer(),
                       stringsAsFactors = FALSE)  
+# Perform Principal Component Analysis (PCA) on the scaled current player data
+pca_result <- prcomp(current_scaled, center = TRUE, scale. = TRUE)
+#Extract absolute values of the first principal component's rotation coefficients# - gives more importance to features with higher PCA weights   
+weights <- abs(pca_result$rotation[,1])
+# Apply the calculated weights to the scaled current and historic player data
+current_weighted <- current_scaled * weights
+historical_weighted <- historical_scaled * weights
 
 # Iterate through each current player to find their most similar historical player
-for (i in 1:nrow(current_scaled)) {  
+for (i in 1:nrow(current_weighted)) {  
   # Extract the current player's stats
-  current_row <- current_scaled[i, , drop = FALSE]  
+  current_row <- current_weighted[i, , drop = FALSE]  
   
   # Compute Euclidean distances between current player and all historical players
-  distances <- proxy::dist(current_row, historical_scaled, method = "euclidean")  
+  distances <- proxy::dist(current_row, historical_weighted, method = "euclidean")  
   
   # Find the index of the closest historical match
-  min_idx <- which.min(distances)  
+  min_idx <- which.min(distances)
+  # Extract the minimum distance (i.e., the closest historical player match)  
+  min_distance <- distances[min_idx]
+  # Find the maximum distance among all historical player comparisons  
+  max_distance <- max(distances)  
+  #Compute a similarity score based on the relative distance  
+  similarity_score <- (1 - (min_distance / max_distance)) * 100
   
   # Store match details in the matches dataframe
   matches <- rbind(matches, data.frame(
     Current_Player = all_data$Player[all_data$Source == "Current"][i],
     Historical_Player = all_data$Player[all_data$Source == "Historical"][min_idx],
     Historical_Year = historical_data$Year[min_idx],
-    Distance = distances[min_idx]
+    Distance = distances[min_idx],
+    Similarity_Score = round(similarity_score, 2)
   ))  
 }  
 
