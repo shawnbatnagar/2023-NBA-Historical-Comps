@@ -3,6 +3,11 @@
 # Overview
 This project aims to use statistics, K-Means Clustering, and Euclidean distance to give each NBA player from the 2023-24 a historical comparsion.
 
+# Introduction
+In discussions of the NBA, a notable topic has been the comparison of current players to players from previous eras. Who is the new Michael Jordan, Kobe Bryant, or Lebron? With a new wave of young players starting to make their mark, I wanted to know the true historical comparisons for current players instead of the eye-test or speculation.
+
+# Methodology
+
 # Data Sources
 
 historical.csv: Contains historical player stats from past NBA seasons.
